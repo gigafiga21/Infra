@@ -12,7 +12,8 @@ Script is in file `GitSyntax/Commit.sh`
 
 Bash function `checkCommitStyle`  
 ```sh
-# Checks git commit naming style
+# Checks git commit naming style:
+# `[Commmit msg starting from capital letter] (issue #[issue id]).`
 # {String} $1 - commit message to check
 ```
 
@@ -29,7 +30,8 @@ Script is in file `GitSyntax/Branch.sh`
 
 Bash function `checkBranchStyle`  
 ```sh
-# Checks current git branch naming style
+# Checks current git branch naming style:
+# `[developer's nickname].[2words-issue-description-with-dash-separator].[issue id]`
 # {Boolean} $1 - loaded in CI or not
 ```
 
