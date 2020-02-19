@@ -5,6 +5,7 @@ Everything for project infrastructure - scripts, configs, etc. for fast start.
 - git syntax checks (branches, commits msgs, etc.)
     - [Commit msg checking](#commit-msg)
     - [Branch name checking](#branch-name)
+- [linting](#linting)
 
 
 ## <a name="commit-msg"></a> Commit msg checking
@@ -41,3 +42,20 @@ Example of usage:
 checkBranchStyle $IS_IN_CI
 ```
 For more examples see `Examples/Branch-*.sh` scripts.
+
+## <a name="branch-name"></a> Linting
+Script is in file `Linters/Linting.sh`  
+
+Bash function `linting`  
+```sh
+# Run linters with configs in folder where script locates
+# Now available ESLint
+# {String} $1 - file list to lint
+```
+
+Example of usage:
+```sh
+. ./Linting/Linting.sh
+linting $LIST_OF_CHANGED_FILES
+```
+For more examples see `Examples/Linting-*.sh` scripts.
