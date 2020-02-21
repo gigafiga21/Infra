@@ -6,6 +6,8 @@ Everything for project infrastructure - scripts, configs, etc. for fast start.
     - [Commit msg checking](#commit-msg)
     - [Branch name checking](#branch-name)
 - [linting](#linting)
+- build
+    - [universal makefile for cpp](#cpp-make)
 
 
 ## <a name="commit-msg"></a> Commit msg checking
@@ -43,7 +45,7 @@ checkBranchStyle $IS_IN_CI
 ```
 For more examples see `Examples/Branch-*.sh` scripts.
 
-## <a name="branch-name"></a> Linting
+## <a name="linting"></a> Linting
 Script is in file `Linters/Linting.sh`  
 
 Bash function `linting`  
@@ -59,3 +61,6 @@ Example of usage:
 linting $LIST_OF_CHANGED_FILES
 ```
 For more examples see `Examples/Linting-*.sh` scripts.
+
+## <a name="cpp-make"></a> Universal makefile for cpp
+Compiles incrementally every `*.cpp` file into `*.o` into `Objects` directory. After that builds binary file into `Build` folder. To build test project enter `Build/Cpp` and type `make`.
