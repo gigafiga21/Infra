@@ -38,14 +38,39 @@ function checkCommitStyle {
         esac
         shift;
     done
+    REGEXP=`getCommitStyleRegexp $STYLE_NAME`;
+
+    # Finding safe symbol to substitute newline character for allowing using `\n` in regex
+    NL=""
+    NL_POSSIBLE=("\ζ")
+    if [[ $MESSAGE == *"\n"* ]]; then
+        for NL_ITEM in $NL_POSSIBLE; do
+            if [[ $MESSAGE != *"$NL_ITEM"* ]]; then
+                NL=$NL_ITEM;
+                break;
+            fi
+        done
+    
+        # Showing error if no substitution symbols found
+        if [[ $NL == "" ]]; then
+            printf "\nerror: looks like your commit message contains one of the [${NL_POSSIBLE[*]}] symbols.";
+            printf "We use one of them to substitute \`\\n\` in the commit messages to extend regexp abilities.";
+            printf "Please, rename your commit somehow.";
+            return 2;
+        fi
+
+        MESSAGE=${MESSAGE//\n/$NL};
+        REGEXP=${REGEXP//\n/$NL};
+    fi
 
     # Checking commit syntax
-    REGEXP=`getCommitStyleRegexp $STYLE_NAME`;
-    TEST=`echo "$MESSAGE" | sed -n "$REGEXP"`;
+    TEST=`echo -e ${MESSAGE} | sed -n -E "${REGEXP}"`;
 
     if [[ $TEST == "" ]]; then
-        printf "\nerror: invalid commit syntax."
-        printf "\n\n  Valid syntax must match regexp $REGEXP \n\n"
+        printf "\nerror: invalid commit syntax.";
+        printf "\n\n  Valid syntax must match regexp ";
+        echo $REGEXP;
+        printf " \n\n";
         return 1;
     fi
 
