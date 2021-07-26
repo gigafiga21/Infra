@@ -15,7 +15,7 @@ function getCommitStyleRegexp {
             echo '/^[A-Z].* (issue \#[0-9]*)\.$/p';
             return 0 ;;
         conventional)
-            echo '';
+            echo '/^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([^\n]+\)|)!?:([^\n]*[^.]|[^:]*\n[^\n]*\.)$/p';
             return 0 ;;
         *)
             echo "${STYLE_NAME}";
