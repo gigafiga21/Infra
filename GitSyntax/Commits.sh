@@ -12,7 +12,7 @@ function getCommitStyleRegexp {
             echo '/^[A-Z].*\.$/p';
             return 0 ;;
         title-issue)
-            echo '/^[A-Z].* (issue \#[0-9]*)\.$/p';
+            echo '/^[A-Z].* \(issue \#[0-9]*\)\.$/p';
             return 0 ;;
         conventional)
             echo '/^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([^\n]+\)|)!?:([^\n]*[^.]|[^:]*\n[^\n]*\.)$/p';
@@ -21,6 +21,37 @@ function getCommitStyleRegexp {
             echo "${STYLE_NAME}";
             return 1 ;;
     esac
+}
+
+# Finds safe symbol to substitute newline character for allowing using `\n` in regex
+# {String} $1 - string to fins symbol to replace newlines
+function getNewlineEscape {
+    MESSAGE="$1";
+    NL_POSSIBLE=("ζ" "╣");
+    NL="";
+    LOG="";
+    for NL_ITEM in "${NL_POSSIBLE[@]}"; do
+        if [[ $MESSAGE != *"$NL_ITEM"* ]]; then
+            NL=$NL_ITEM;
+            break;
+        fi
+    done
+
+    # throwing error if no substitution found
+    if [[ $NL == "" ]]; then
+        return 1;
+    fi
+
+    echo "$NL";
+    return 0;
+}
+
+# Runs regexp testing for commit message
+# Echoes "" if commit message does not fit regexp, in other cases string will not be empty
+# {String} $1 - commit message
+# {String} $2 - regexp for testing
+function testCommitStyleRegexp {
+    echo -e "$1" | sed -n -E "$2";
 }
 
 # Checks git commit naming style
@@ -41,32 +72,24 @@ function checkCommitStyle {
     REGEXP=`getCommitStyleRegexp $STYLE_NAME`;
 
     # Finding safe symbol to substitute newline character for allowing using `\n` in regex
-    NL=""
-    NL_POSSIBLE=("\ζ")
     if [[ $MESSAGE == *"\n"* ]]; then
-        for NL_ITEM in $NL_POSSIBLE; do
-            if [[ $MESSAGE != *"$NL_ITEM"* ]]; then
-                NL=$NL_ITEM;
-                break;
-            fi
-        done
-    
-        # Showing error if no substitution symbols found
-        if [[ $NL == "" ]]; then
+        NL=`getNewlineEscape "$MESSAGE"`;
+        ERROR=$?;
+
+        # Showing error if no newline substitution symbols found
+        if [[ $ERROR -ne 0 ]]; then
             printf "\nerror: looks like your commit message contains one of the [${NL_POSSIBLE[*]}] symbols.";
             printf "We use one of them to substitute \`\\n\` in the commit messages to extend regexp abilities.";
             printf "Please, rename your commit somehow.";
             return 2;
         fi
-
-        MESSAGE=${MESSAGE//\n/$NL};
-        REGEXP=${REGEXP//\n/$NL};
+        
+        MESSAGE=${MESSAGE//\\n/$NL};
+        REGEXP=${REGEXP//\\n/$NL};
     fi
 
     # Checking commit syntax
-    TEST=`echo -e ${MESSAGE} | sed -n -E "${REGEXP}"`;
-
-    if [[ $TEST == "" ]]; then
+    if [[ `testCommitStyleRegexp "$MESSAGE" "$REGEXP"` == "" ]]; then
         printf "\nerror: invalid commit syntax.";
         printf "\n\n  Valid syntax must match regexp ";
         echo $REGEXP;
