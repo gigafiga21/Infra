@@ -18,6 +18,7 @@ Bash function `checkCommitStyle`
 # Checks git commit naming style:
 # `[Commmit msg starting from capital letter] (issue #[issue id]).`
 # {String} $1 - commit message to check
+# {String} --style - preset name for checking commit style
 ```
 
 Example of usage:
