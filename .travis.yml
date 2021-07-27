@@ -1,0 +1,9 @@
+jobs:
+  include:
+
+    - name: Testing GitSyntax package
+      language: bash
+      install:
+        - make install-bats
+      script:
+        - make test-git-syntax
